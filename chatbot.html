@@ -1,0 +1,1305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Memvid Knowledge Base</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
+
+  :root {
+    --bg: #f7f6f3;
+    --surface: #ffffff;
+    --border: #e5e3de;
+    --accent: #2563eb;
+    --accent-light: #eff6ff;
+    --text: #1a1917;
+    --muted: #78716c;
+    --si: #059669;
+    --ta: #7c3aed;
+    --en: #2563eb;
+    --success: #16a34a;
+    --error: #dc2626;
+    --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-md: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.05);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+    box-shadow: var(--shadow);
+    z-index: 10;
+  }
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .logo {
+    width: 28px; height: 28px;
+    background: var(--accent);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    color: white;
+    font-size: 14px;
+  }
+  .header-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .header-subtitle {
+    font-size: 12px;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+  }
+
+  /* ── LANG SELECTOR ── */
+  .lang-selector {
+    display: flex;
+    gap: 4px;
+    background: var(--bg);
+    padding: 3px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+  .lang-btn {
+    padding: 4px 12px;
+    border-radius: 6px;
+    border: none;
+    background: none;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .lang-btn.active-en { background: var(--surface); color: var(--en); box-shadow: var(--shadow); }
+  .lang-btn.active-si { background: var(--surface); color: var(--si); box-shadow: var(--shadow); }
+  .lang-btn.active-ta { background: var(--surface); color: var(--ta); box-shadow: var(--shadow); }
+
+  /* ── LAYOUT ── */
+  .main {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+    min-height: 0;
+    position: relative;
+  }
+  #chat-view {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-height: 0;
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    width: 300px;
+    flex-shrink: 0;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-height: 0;
+  }
+  .sidebar-section {
+    padding: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .sidebar-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--muted);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  /* ── INGEST ── */
+  .ingest-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 10px;
+  }
+  .tab-btn {
+    flex: 1;
+    padding: 5px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--bg);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .tab-btn.active {
+    background: var(--accent-light);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .ingest-panel { display: none; }
+  .ingest-panel.active { display: block; }
+
+  textarea, input[type="text"], input[type="url"] {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    background: var(--bg);
+    color: var(--text);
+    resize: vertical;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  textarea:focus, input:focus { border-color: var(--accent); }
+  textarea { min-height: 80px; }
+
+  .ingest-btn {
+    width: 100%;
+    margin-top: 8px;
+    padding: 8px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+  .ingest-btn:hover { opacity: 0.88; }
+  .ingest-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .file-drop {
+    border: 2px dashed var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.15s;
+    position: relative;
+  }
+  .file-drop:hover { border-color: var(--accent); background: var(--accent-light); }
+  .file-drop input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+  .file-drop-text { font-size: 12px; color: var(--muted); }
+  .file-drop-text strong { color: var(--accent); }
+
+  /* ── STATUS PILLS ── */
+  .status-area {
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .status-pill {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+  .status-pill .label { color: var(--muted); }
+  .status-pill .val { font-family: 'DM Mono', monospace; font-weight: 500; }
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--success); display: inline-block; margin-right: 6px; }
+
+  /* ── SOURCES PANEL ── */
+  .sources-panel {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px 16px;
+  }
+  .source-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 8px;
+    font-size: 12px;
+    line-height: 1.5;
+  }
+  .source-card-meta {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+  }
+  .source-lang {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 500;
+  }
+  .lang-en { background: #eff6ff; color: var(--en); }
+  .lang-si { background: #ecfdf5; color: var(--si); }
+  .lang-ta { background: #f5f3ff; color: var(--ta); }
+  .source-score { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--muted); }
+  .source-text { color: #44403c; }
+
+  /* ── CHAT AREA ── */
+  .chat-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-height: 0;
+  }
+
+  .messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .msg {
+    display: flex;
+    gap: 10px;
+    max-width: 720px;
+  }
+  .msg.user { flex-direction: row-reverse; align-self: flex-end; }
+  .msg.assistant { align-self: flex-start; }
+
+  .msg-avatar {
+    width: 28px; height: 28px;
+    border-radius: 8px;
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .msg.user .msg-avatar { background: var(--accent); color: white; }
+  .msg.assistant .msg-avatar { background: #f0fdf4; color: var(--si); border: 1px solid #bbf7d0; }
+
+  .msg-bubble {
+    padding: 10px 14px;
+    border-radius: 12px;
+    font-size: 14px;
+    line-height: 1.6;
+    max-width: 560px;
+  }
+  .msg.user .msg-bubble {
+    background: var(--accent);
+    color: white;
+    border-radius: 12px 4px 12px 12px;
+  }
+  .msg.assistant .msg-bubble {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px 12px 12px 12px;
+    box-shadow: var(--shadow);
+  }
+
+  .msg-lang-badge {
+    font-size: 10px;
+    font-family: 'DM Mono', monospace;
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-bottom: 5px;
+    display: inline-block;
+  }
+
+  /* ── EMPTY STATE ── */
+  .empty-state {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    color: var(--muted);
+    padding: 40px;
+    text-align: center;
+  }
+  .empty-icon { font-size: 40px; }
+  .empty-title { font-size: 16px; font-weight: 600; color: var(--text); }
+  .empty-sub { font-size: 13px; line-height: 1.6; max-width: 320px; }
+
+  .suggestion-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-top: 8px;
+  }
+  .chip {
+    padding: 6px 14px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    font-size: 12px;
+    background: var(--surface);
+    cursor: pointer;
+    transition: all 0.15s;
+    color: var(--text);
+  }
+  .chip:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+
+  /* ── INPUT AREA ── */
+  .input-area {
+    padding: 16px 24px;
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+  }
+  .input-wrap {
+    flex: 1;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: border-color 0.15s;
+  }
+  .input-wrap:focus-within { border-color: var(--accent); }
+  #chat-input {
+    flex: 1;
+    border: none;
+    background: none;
+    outline: none;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    resize: none;
+    height: 22px;
+    max-height: 120px;
+    overflow-y: auto;
+  }
+  #chat-input::placeholder { color: var(--muted); }
+
+  .send-btn {
+    width: 36px; height: 36px;
+    background: var(--accent);
+    border: none;
+    border-radius: 10px;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: opacity 0.15s;
+    flex-shrink: 0;
+  }
+  .send-btn:hover { opacity: 0.88; }
+  .send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed;
+    bottom: 24px; right: 24px;
+    background: var(--text);
+    color: white;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    box-shadow: var(--shadow-md);
+    opacity: 0;
+    transform: translateY(8px);
+    transition: all 0.2s;
+    pointer-events: none;
+    z-index: 100;
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+  .toast.success { background: var(--success); }
+  .toast.error { background: var(--error); }
+
+  /* ── TYPING INDICATOR ── */
+  .typing {
+    display: flex;
+    gap: 4px;
+    padding: 14px;
+    align-items: center;
+  }
+  .typing span {
+    width: 6px; height: 6px;
+    background: var(--muted);
+    border-radius: 50%;
+    animation: bounce 1.2s infinite;
+  }
+  .typing span:nth-child(2) { animation-delay: 0.2s; }
+  .typing span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes bounce {
+    0%, 60%, 100% { transform: translateY(0); }
+    30% { transform: translateY(-5px); }
+  }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="header-left">
+    <div class="logo">M</div>
+    <div>
+      <div class="header-title">Memvid Knowledge Base</div>
+      <div class="header-subtitle">Sinhala · Tamil · English</div>
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;gap:12px">
+    <div class="mode-toggle">
+      <button class="mode-btn mode-active" id="chat-mode-btn" onclick="switchMode('chat')">💬 Chat</button>
+      <button class="mode-btn" id="fc-mode-btn" onclick="switchMode('factcheck')">🔍 Fact Check</button>
+    </div>
+  </div>
+  <div class="lang-selector">
+    <button class="lang-btn active-en" onclick="setLang('en', this)">English</button>
+    <button class="lang-btn" onclick="setLang('si', this)">සිංහල</button>
+    <button class="lang-btn" onclick="setLang('ta', this)">தமிழ்</button>
+  </div>
+</header>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+
+    <!-- Ingest -->
+    <div class="sidebar-section">
+      <div class="sidebar-label">Add to Knowledge Base</div>
+      <div class="ingest-tabs">
+        <button class="tab-btn active" onclick="switchTab('text', this)">Text</button>
+        <button class="tab-btn" onclick="switchTab('url', this)">URL</button>
+        <button class="tab-btn" onclick="switchTab('pdf', this)">PDF</button>
+      </div>
+
+      <!-- TAG FIELDS (shared across all tabs) -->
+      <div id="tag-fields" style="margin-bottom:10px">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px">
+          <div>
+            <div style="font-size:10px;color:var(--muted);margin-bottom:3px">DATE</div>
+            <input type="date" id="tag-date" style="font-size:12px;padding:5px 8px">
+          </div>
+          <div>
+            <div style="font-size:10px;color:var(--muted);margin-bottom:3px">DOC TYPE</div>
+            <select id="tag-doctype" style="width:100%;padding:5px 8px;border:1px solid var(--border);border-radius:8px;font-family:DM Sans,sans-serif;font-size:12px;background:var(--bg);color:var(--text);outline:none">
+              <option value="">— select —</option>
+              <option value="report">Report</option>
+              <option value="article">Article</option>
+              <option value="policy">Policy</option>
+              <option value="meeting">Meeting Notes</option>
+              <option value="research">Research</option>
+              <option value="legal">Legal</option>
+              <option value="financial">Financial</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+        </div>
+        <div style="margin-bottom:6px">
+          <div style="font-size:10px;color:var(--muted);margin-bottom:3px">AUTHOR</div>
+          <input type="text" id="tag-author" placeholder="Author name">
+        </div>
+        <div style="margin-bottom:6px">
+          <div style="font-size:10px;color:var(--muted);margin-bottom:3px">KEY AREAS <span style="color:var(--muted);font-size:9px">(press Enter to add)</span></div>
+          <div id="areas-chips" class="chip-input-wrap">
+            <input type="text" id="tag-areas-input" placeholder="e.g. Finance, Policy" onkeydown="addChipOnEnter(event,'areas')">
+          </div>
+        </div>
+        <div>
+          <div style="font-size:10px;color:var(--muted);margin-bottom:3px">KEYWORDS <span style="color:var(--muted);font-size:9px">(press Enter to add)</span></div>
+          <div id="keywords-chips" class="chip-input-wrap">
+            <input type="text" id="tag-keywords-input" placeholder="e.g. budget, Q1, 2025" onkeydown="addChipOnEnter(event,'keywords')">
+          </div>
+        </div>
+      </div>
+
+      <div class="ingest-panel active" id="panel-text">
+        <textarea id="ingest-text" placeholder="Paste any text, article, or notes..."></textarea>
+        <button class="ingest-btn" onclick="ingestText()">Add to KB →</button>
+      </div>
+
+      <div class="ingest-panel" id="panel-url">
+        <input type="url" id="ingest-url" placeholder="https://example.com/article">
+        <button class="ingest-btn" onclick="ingestUrl()">Scrape & Add →</button>
+      </div>
+
+      <div class="ingest-panel" id="panel-pdf">
+        <div class="file-drop" onclick="document.getElementById('pdf-file').click()">
+          <input type="file" id="pdf-file" accept=".pdf" onchange="ingestPdf(this)">
+          <div class="file-drop-text">
+            <strong>Click to upload PDF</strong><br>
+            Translated to Sinhala + Tamil automatically
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Status -->
+    <div class="status-area">
+      <div class="sidebar-label" style="margin-bottom:6px">Status</div>
+      <div class="status-pill">
+        <span class="label"><span class="dot"></span>API</span>
+        <span class="val" id="api-status">checking...</span>
+      </div>
+      <div class="status-pill">
+        <span class="label">Chunks</span>
+        <span class="val" id="total-chunks">—</span>
+      </div>
+      <div class="status-pill">
+        <span class="label">Sources</span>
+        <span class="val" id="total-sources">—</span>
+      </div>
+    </div>
+
+    <!-- Sources -->
+    <div class="sidebar-label" style="padding: 12px 16px 4px; flex-shrink:0">Last Sources</div>
+    <div class="sources-panel" id="sources-panel">
+      <div style="font-size:12px; color:var(--muted); text-align:center; padding:20px">
+        Sources will appear after search
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- FACT CHECK VIEW -->
+  <div id="fc-view">
+    <div class="fc-input-area">
+      <div style="font-size:11px;font-weight:600;color:var(--muted);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:2px">Paste Article or Excerpt</div>
+      <textarea id="fc-text" placeholder="Paste any article, news excerpt, or text to fact-check..."></textarea>
+      <div class="fc-input-row">
+        <input type="url" id="fc-source" placeholder="Source URL (optional)">
+        <button id="fc-btn" onclick="runFactCheck()">Analyse Claims</button>
+      </div>
+    </div>
+    <div class="fc-results" id="fc-results">
+      <div style="text-align:center;padding:40px;color:var(--muted);font-size:13px">
+        <div style="font-size:32px;margin-bottom:12px">🔍</div>
+        <div style="font-weight:600;color:var(--text);margin-bottom:6px">Claim-by-Claim Fact Checking</div>
+        <div style="max-width:360px;margin:0 auto;line-height:1.6">Paste any article or excerpt above. Each claim will be identified, classified, and verified independently using Tree of Thought reasoning.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHAT -->
+  <div class="chat-area" id="chat-view">
+    <div class="messages" id="messages">
+      <div class="empty-state" id="empty-state">
+        <div class="empty-icon">🧠</div>
+        <div class="empty-title">Ask your knowledge base</div>
+        <div class="empty-sub">Add documents on the left, then ask questions in English, Sinhala, or Tamil.</div>
+        <div class="suggestion-chips">
+          <div class="chip" onclick="askChip(this)">Who manages the budget?</div>
+          <div class="chip" onclick="askChip(this)">අයවැය කළමනාකරු කවුද?</div>
+          <div class="chip" onclick="askChip(this)">பட்ஜெட்டை யார் நிர்வகிக்கிறார்?</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="input-area">
+      <div class="input-wrap">
+        <textarea
+          id="chat-input"
+          placeholder="Ask a question in any language..."
+          onkeydown="handleKey(event)"
+          oninput="autoResize(this)"
+          rows="1"
+        ></textarea>
+      </div>
+      <button class="send-btn" id="send-btn" onclick="sendMessage()">↑</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+</div>
+
+<script>
+const API = 'http://localhost:8000';
+let currentLang = 'en';
+let sessionId = null;
+let isLoading = false;
+
+const LANG_LABELS = { en: 'English', si: 'Sinhala', ta: 'Tamil' };
+const LANG_CLASS  = { en: 'lang-en', si: 'lang-si', ta: 'lang-ta' };
+
+// ── Init ──────────────────────────────────────────────────
+window.onload = () => {
+  checkStatus();
+  setInterval(checkStatus, 30000);  // every 30s is enough
+};
+
+async function checkStatus() {
+  try {
+    const r = await fetch(`${API}/status`);
+    const d = await r.json();
+    document.getElementById('api-status').textContent = 'online';
+    document.getElementById('total-chunks').textContent = d.stats.total_chunks ?? '0';
+    document.getElementById('total-sources').textContent = d.stats.total_sources ?? '0';
+  } catch {
+    document.getElementById('api-status').textContent = 'offline';
+  }
+}
+
+// ── Language ──────────────────────────────────────────────
+function setLang(lang, btn) {
+  currentLang = lang;
+  document.querySelectorAll('.lang-btn').forEach(b => {
+    b.className = 'lang-btn';
+  });
+  btn.className = `lang-btn active-${lang}`;
+}
+
+// ── Tabs ──────────────────────────────────────────────────
+function switchTab(tab, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.ingest-panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(`panel-${tab}`).classList.add('active');
+}
+
+// ── Ingest ────────────────────────────────────────────────
+async function ingestText() {
+  const text = document.getElementById('ingest-text').value.trim();
+  if (!text) return toast('Please enter some text', 'error');
+  const tags = getTags();
+  await ingest('/ingest/text', { text, source: 'manual', tags }, 'Text added & translated ✓');
+  document.getElementById('ingest-text').value = '';
+  clearTags();
+}
+
+async function ingestUrl() {
+  const url = document.getElementById('ingest-url').value.trim();
+  if (!url) return toast('Please enter a URL', 'error');
+  const tags = getTags();
+  await ingest('/ingest/url', { url, tags }, 'URL scraped & translated ✓');
+  document.getElementById('ingest-url').value = '';
+  clearTags();
+}
+
+async function ingestPdf(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const tags = getTags();
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('date',      tags.date);
+  formData.append('doc_type',  tags.doc_type);
+  formData.append('author',    tags.author);
+  formData.append('key_areas', tags.key_areas.join(','));
+  formData.append('keywords',  tags.keywords.join(','));
+  toast('Uploading PDF...', '');
+  try {
+    const r = await fetch(`${API}/ingest/pdf`, { method: 'POST', body: formData });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.detail);
+    toast(`PDF added — ${d.chunks_added} chunks ✓`, 'success');
+    clearTags();
+    checkStatus();
+  } catch (e) {
+    toast(`Error: ${e.message}`, 'error');
+  }
+}
+
+async function ingest(endpoint, body, successMsg) {
+  toast('Processing & translating...', '');
+  try {
+    const r = await fetch(`${API}${endpoint}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.detail);
+    toast(successMsg, 'success');
+    checkStatus();
+  } catch (e) {
+    toast(`Error: ${e.message}`, 'error');
+  }
+}
+
+// ── Chat ──────────────────────────────────────────────────
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+}
+
+function autoResize(el) {
+  el.style.height = '22px';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+}
+
+function askChip(chip) {
+  document.getElementById('chat-input').value = chip.textContent;
+  sendMessage();
+}
+
+async function sendMessage() {
+  const input = document.getElementById('chat-input');
+  const query = input.value.trim();
+  if (!query || isLoading) return;
+
+  isLoading = true;
+  document.getElementById('send-btn').disabled = true;
+  document.getElementById('empty-state')?.remove();
+
+  // Add user message
+  addMessage('user', query);
+  input.value = '';
+  input.style.height = '22px';
+
+  // Add typing indicator
+  const typingId = 'typing-' + Date.now();
+  addTyping(typingId);
+
+  try {
+    const r = await fetch(`${API}/ask`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        question: query,
+        response_lang: currentLang,
+        session_id: sessionId,
+        top_k: 5,
+      }),
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.detail);
+
+    sessionId = d.session_id;
+    removeTyping(typingId);
+    addMessage('assistant', d.answer, currentLang);
+    showSources(d.sources);
+
+  } catch (e) {
+    removeTyping(typingId);
+    addMessage('assistant', `Sorry, something went wrong: ${e.message}`, 'en');
+  }
+
+  isLoading = false;
+  document.getElementById('send-btn').disabled = false;
+  input.focus();
+}
+
+// ── Message rendering ─────────────────────────────────────
+function addMessage(role, text, lang) {
+  const msgs = document.getElementById('messages');
+  const div = document.createElement('div');
+  div.className = `msg ${role}`;
+
+  const avatar = document.createElement('div');
+  avatar.className = 'msg-avatar';
+  avatar.textContent = role === 'user' ? 'U' : 'M';
+
+  const bubble = document.createElement('div');
+  bubble.className = 'msg-bubble';
+
+  if (role === 'assistant' && lang) {
+    const badge = document.createElement('div');
+    badge.className = `msg-lang-badge ${LANG_CLASS[lang] || 'lang-en'}`;
+    badge.textContent = LANG_LABELS[lang] || lang;
+    bubble.appendChild(badge);
+  }
+
+  const textNode = document.createElement('div');
+  textNode.textContent = text;
+  bubble.appendChild(textNode);
+
+  div.appendChild(avatar);
+  div.appendChild(bubble);
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function addTyping(id) {
+  const msgs = document.getElementById('messages');
+  const div = document.createElement('div');
+  div.className = 'msg assistant';
+  div.id = id;
+  div.innerHTML = `
+    <div class="msg-avatar">M</div>
+    <div class="msg-bubble">
+      <div class="typing"><span></span><span></span><span></span></div>
+    </div>`;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function removeTyping(id) {
+  document.getElementById(id)?.remove();
+}
+
+// ── Sources ───────────────────────────────────────────────
+function showSources(sources) {
+  const panel = document.getElementById('sources-panel');
+  panel.innerHTML = '';
+  sources.forEach(s => {
+    const lang = detectLangFromText(s.text);
+    const meta = s.metadata || {};
+    const card = document.createElement('div');
+    card.className = 'source-card';
+
+    // Build tag pills
+    let tagHtml = '';
+    if (meta.doc_type)  tagHtml += `<span class="source-lang lang-en">${meta.doc_type}</span> `;
+    if (meta.date)      tagHtml += `<span style="font-size:10px;color:var(--muted)">${meta.date}</span> `;
+    if (meta.author)    tagHtml += `<span style="font-size:10px;color:var(--muted)">✍ ${meta.author}</span>`;
+
+    // Keywords
+    const kws = [...(meta.key_areas||[]), ...(meta.keywords||[])].slice(0,4);
+    const kwHtml = kws.map(k =>
+      `<span style="background:var(--bg);border:1px solid var(--border);border-radius:3px;padding:1px 5px;font-size:10px;color:var(--muted)">${k}</span>`
+    ).join(' ');
+
+    card.innerHTML = `
+      <div class="source-card-meta">
+        <span class="source-lang ${LANG_CLASS[lang] || 'lang-en'}">${lang}</span>
+        <span class="source-score">${s.score.toFixed(3)}</span>
+      </div>
+      ${tagHtml ? `<div style="margin-bottom:4px">${tagHtml}</div>` : ''}
+      ${kwHtml  ? `<div style="margin-bottom:5px;display:flex;flex-wrap:wrap;gap:3px">${kwHtml}</div>` : ''}
+      <div class="source-text">${s.text.slice(0, 120)}${s.text.length > 120 ? '…' : ''}</div>`;
+    panel.appendChild(card);
+  });
+}
+
+function detectLangFromText(text) {
+  if (/[\u0D80-\u0DFF]/.test(text)) return 'si';
+  if (/[\u0B80-\u0BFF]/.test(text)) return 'ta';
+  return 'en';
+}
+
+// ── Tag helpers ──────────────────────────────────────────
+const chipData = { areas: [], keywords: [] };
+
+function addChipOnEnter(e, type) {
+  if (e.key !== 'Enter') return;
+  e.preventDefault();
+  const input = document.getElementById(`tag-${type === 'areas' ? 'areas' : 'keywords'}-input`);
+  const val = input.value.trim();
+  if (!val) return;
+  chipData[type].push(val);
+  renderChips(type);
+  input.value = '';
+}
+
+function renderChips(type) {
+  const wrap = document.getElementById(`${type === 'areas' ? 'areas' : 'keywords'}-chips`);
+  const input = wrap.querySelector('input');
+  // Remove existing chips
+  wrap.querySelectorAll('.chip-tag').forEach(c => c.remove());
+  chipData[type].forEach((val, i) => {
+    const chip = document.createElement('span');
+    chip.className = 'chip-tag';
+    chip.innerHTML = `${val}<button onclick="removeChip('${type}', ${i})">×</button>`;
+    wrap.insertBefore(chip, input);
+  });
+}
+
+function removeChip(type, idx) {
+  chipData[type].splice(idx, 1);
+  renderChips(type);
+}
+
+function getTags() {
+  return {
+    date:      document.getElementById('tag-date').value || new Date().toISOString().split('T')[0],
+    doc_type:  document.getElementById('tag-doctype').value,
+    author:    document.getElementById('tag-author').value.trim(),
+    key_areas: chipData.areas,
+    keywords:  chipData.keywords,
+  };
+}
+
+function clearTags() {
+  document.getElementById('tag-date').value = '';
+  document.getElementById('tag-doctype').value = '';
+  document.getElementById('tag-author').value = '';
+  chipData.areas = [];
+  chipData.keywords = [];
+  renderChips('areas');
+  renderChips('keywords');
+}
+
+// ── Toast ─────────────────────────────────────────────────
+function toast(msg, type) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = `toast show ${type}`;
+  setTimeout(() => el.className = 'toast', 3000);
+}
+</script>
+</body>
+</html>
+<script>
+// ── Fact Check Mode ───────────────────────────────────────
+let currentMode = 'chat';
+
+function switchMode(mode) {
+  currentMode = mode;
+  document.getElementById('chat-mode-btn').classList.toggle('mode-active', mode === 'chat');
+  document.getElementById('fc-mode-btn').classList.toggle('mode-active', mode === 'factcheck');
+  document.getElementById('chat-view').style.display = mode === 'chat' ? 'flex' : 'none';
+  document.getElementById('fc-view').style.display = mode === 'factcheck' ? 'flex' : 'none';
+}
+
+async function runFactCheck() {
+  const text = document.getElementById('fc-text').value.trim();
+  const source = document.getElementById('fc-source').value.trim();
+  if (!text) return toast('Please paste an article or excerpt', 'error');
+
+  const resultsDiv = document.getElementById('fc-results');
+  const btn = document.getElementById('fc-btn');
+  resultsDiv.innerHTML = '';
+  btn.disabled = true;
+  btn.textContent = 'Analysing...';
+
+  // Status card
+  resultsDiv.innerHTML = `
+    <div class="fc-status-card" id="fc-status">
+      <div class="fc-spinner"></div>
+      <span id="fc-status-msg">Identifying claims...</span>
+    </div>`;
+
+  try {
+    const response = await fetch('http://localhost:8000/factcheck', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text, source }),
+    });
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+
+      // Parse SSE events from buffer
+      const events = buffer.split('\n\n');
+      buffer = events.pop(); // keep incomplete last chunk
+
+      for (const eventStr of events) {
+        if (!eventStr.trim()) continue;
+        const lines = eventStr.split('\n');
+        let eventType = '';
+        let eventData = '';
+        for (const line of lines) {
+          if (line.startsWith('event: ')) eventType = line.slice(7);
+          if (line.startsWith('data: ')) eventData = line.slice(6);
+        }
+        if (eventType && eventData) {
+          try {
+            handleFCEvent(eventType, JSON.parse(eventData));
+          } catch(e) {}
+        }
+      }
+    }
+  } catch(e) {
+    resultsDiv.innerHTML += `<div class="fc-error">Error: ${e.message}</div>`;
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Analyse Claims';
+}
+
+function handleFCEvent(type, data) {
+  const resultsDiv = document.getElementById('fc-results');
+
+  if (type === 'status') {
+    document.getElementById('fc-status-msg').textContent = data.message;
+  }
+
+  else if (type === 'claims_found') {
+    document.getElementById('fc-status').innerHTML = `
+      <div style="display:flex;gap:16px;flex-wrap:wrap">
+        <div class="fc-stat"><span class="fc-stat-num">${data.total}</span><span class="fc-stat-label">Total Claims</span></div>
+        <div class="fc-stat"><span class="fc-stat-num" style="color:var(--accent)">${data.verifiable}</span><span class="fc-stat-label">Verifiable</span></div>
+        <div class="fc-stat"><span class="fc-stat-num" style="color:var(--muted)">${data.unverifiable}</span><span class="fc-stat-label">Unverifiable</span></div>
+      </div>`;
+  }
+
+  else if (type === 'claim_start') {
+    // Remove any existing card with same index (prevent duplicates)
+    const existing = document.getElementById('claim-' + data.index);
+    if (existing) existing.remove();
+    const div = document.createElement('div');
+    div.className = 'fc-claim-card loading';
+    div.id = 'claim-' + data.index;
+    div.innerHTML = `
+      <div class="fc-claim-header">
+        <span class="fc-claim-num">${data.index + 1}</span>
+        <span class="fc-claim-text">"${data.claim}"</span>
+        <span class="fc-badge fc-badge-${data.classification.toLowerCase()}">${data.classification}</span>
+      </div>
+      <div class="fc-claim-body">
+        <div class="fc-loading-row"><div class="fc-spinner-sm"></div> ${data.message}</div>
+      </div>`;
+    resultsDiv.appendChild(div);
+    div.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  else if (type === 'claim_result') {
+    const card = document.getElementById('claim-' + data.index);
+    if (!card) return;
+    card.classList.remove('loading');
+
+    // Make header clickable to collapse/expand
+    const header = card.querySelector('.fc-claim-header');
+    header.style.cursor = 'pointer';
+    header.onclick = () => {
+      const body = card.querySelector('.fc-claim-body');
+      const isHidden = body.style.display === 'none';
+      body.style.display = isHidden ? 'flex' : 'none';
+      const toggle = card.querySelector('.fc-toggle');
+      if (toggle) toggle.textContent = isHidden ? '▲' : '▼';
+    };
+    // Add toggle arrow to header
+    const arrow = document.createElement('span');
+    arrow.className = 'fc-toggle';
+    arrow.textContent = '▼';
+    arrow.style.cssText = 'font-size:10px;color:var(--muted);flex-shrink:0;margin-left:auto';
+    header.appendChild(arrow);
+
+    if (data.classification === 'UNVERIFIABLE') {
+      card.querySelector('.fc-claim-body').innerHTML = `
+        <div class="fc-unverifiable">
+          <span class="fc-unverifiable-icon">○</span>
+          <span>${data.unverifiable_reason || 'Opinion, prediction, or value judgment — cannot be verified.'}</span>
+        </div>`;
+      return;
+    }
+
+    const criteria = data.criteria || {};
+    const flags = data.severity_flags || [];
+    const confidence = data.confidence || 'MEDIUM';
+    const confColor = confidence === 'HIGH' ? 'var(--green)' : confidence === 'LOW' ? 'var(--red)' : 'var(--accent3)';
+
+    // Stars bar
+    const starsHtml = Object.entries(criteria).map(([key, val]) => {
+      const label = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+      const filled = '★'.repeat(val.stars);
+      const empty  = '☆'.repeat(val.max - val.stars);
+      return `<div class="fc-criterion">
+        <div class="fc-criterion-label">${label}</div>
+        <div class="fc-criterion-stars">${filled}${empty} <span class="fc-criterion-score">${val.stars}/${val.max}</span></div>
+        <div class="fc-criterion-reason">${val.reasoning}</div>
+      </div>`;
+    }).join('');
+
+    // Flags
+    const flagsHtml = flags.length ? flags.map(f =>
+      `<span class="fc-flag">${f.replace(/_/g, ' ')}</span>`
+    ).join('') : '';
+
+    // ToT branches
+    const totHtml = [
+      ['Advocate', data.branch_advocate],
+      ['Critic', data.branch_critic],
+      ['Methodologist', data.branch_methodologist],
+      ['Contextualiser', data.branch_contextualiser],
+    ].map(([label, text]) => text ? `
+      <div class="fc-branch">
+        <div class="fc-branch-label">${label}</div>
+        <div class="fc-branch-text">${text}</div>
+      </div>` : ''
+    ).join('');
+
+    card.querySelector('.fc-claim-body').innerHTML = `
+      ${data.classification === 'MIXED' ? `
+        <div class="fc-mixed-note">
+          <strong>Factual:</strong> ${data.factual_component || '—'}<br>
+          <strong>Interpretive:</strong> ${data.interpretive_layer || '—'}
+        </div>` : ''}
+      <div class="fc-score-row">
+        <div class="fc-total-score">${data.total_stars}/${data.max_stars}</div>
+        <div class="fc-confidence" style="color:${confColor}">${confidence} CONFIDENCE</div>
+        ${flagsHtml ? `<div class="fc-flags">${flagsHtml}</div>` : ''}
+      </div>
+      <div class="fc-criteria">${starsHtml}</div>
+      <div class="fc-tot">${totHtml}</div>
+      <div class="fc-summary">${data.summary || ''}</div>`;
+  }
+
+  else if (type === 'complete') {
+    const div = document.createElement('div');
+    div.className = 'fc-complete';
+    div.textContent = '✓ Analysis complete — ' + data.verifiable_analysed + ' claims verified';
+    document.getElementById('fc-results').appendChild(div);
+  }
+
+  else if (type === 'error') {
+    document.getElementById('fc-results').innerHTML +=
+      `<div class="fc-error">${data.message}</div>`;
+  }
+}
+</script>
+
+<style>
+/* ── Mode toggle ── */
+.mode-toggle { display:flex; gap:4px; background:var(--bg); padding:3px; border-radius:8px; border:1px solid var(--border); }
+.mode-btn { padding:5px 14px; border-radius:6px; border:none; background:none; font-family:'DM Sans',sans-serif; font-size:12px; font-weight:500; color:var(--muted); cursor:pointer; transition:all 0.15s; }
+.mode-active { background:var(--surface); color:var(--text); box-shadow:var(--shadow); }
+
+/* ── Fact check view ── */
+#fc-view {
+  flex: 1;
+  display: none;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--bg);
+}
+.fc-input-area {
+  flex-shrink: 0;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.fc-input-area textarea {
+  min-height: 80px;
+  max-height: 120px;
+  font-size: 13px;
+  resize: vertical;
+}
+.fc-input-row { display: flex; gap: 10px; }
+.fc-input-row input { flex: 1; }
+#fc-btn {
+  padding: 9px 20px;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.15s;
+  flex-shrink: 0;
+}
+#fc-btn:hover { opacity: 0.88; }
+#fc-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.fc-results {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 20px 24px 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* ── Status ── */
+.fc-status-card { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:16px 20px; display:flex; align-items:center; gap:12px; }
+.fc-spinner { width:16px; height:16px; border:2px solid var(--border); border-top-color:var(--accent); border-radius:50%; animation:spin 0.8s linear infinite; flex-shrink:0; }
+.fc-spinner-sm { width:12px; height:12px; border:2px solid var(--border); border-top-color:var(--accent); border-radius:50%; animation:spin 0.8s linear infinite; display:inline-block; }
+@keyframes spin { to { transform:rotate(360deg); } }
+.fc-stat { display:flex; flex-direction:column; gap:2px; }
+.fc-stat-num { font-size:22px; font-weight:700; font-family:'DM Mono',monospace; }
+.fc-stat-label { font-size:11px; color:var(--muted); }
+
+/* ── Claim cards ── */
+.fc-claim-card { background:var(--surface); border:1px solid var(--border); border-radius:10px; overflow:hidden; transition:border-color 0.2s; }
+.fc-claim-card.loading { opacity:0.8; }
+.fc-claim-header { display:flex; align-items:flex-start; gap:10px; padding:14px 16px; border-bottom:1px solid var(--border); flex-wrap:wrap; }
+.fc-claim-num { flex-shrink:0; width:22px; height:22px; background:var(--bg); border:1px solid var(--border); border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; font-family:'DM Mono',monospace; color:var(--muted); }
+.fc-claim-text { flex:1; font-size:13px; font-style:italic; color:var(--text); line-height:1.5; }
+.fc-badge { flex-shrink:0; font-size:10px; font-family:'DM Mono',monospace; padding:3px 7px; border-radius:4px; font-weight:600; letter-spacing:0.05em; }
+.fc-badge-verifiable { background:#eff6ff; color:var(--en); }
+.fc-badge-mixed { background:#fff3e0; color:var(--accent3); }
+.fc-badge-unverifiable { background:var(--bg); color:var(--muted); }
+.fc-claim-body { padding:14px 16px 20px; display:flex; flex-direction:column; gap:12px; }
+.fc-loading-row { display:flex; align-items:center; gap:8px; font-size:13px; color:var(--muted); }
+
+/* ── Unverifiable ── */
+.fc-unverifiable { display:flex; gap:10px; align-items:flex-start; font-size:13px; color:var(--muted); font-style:italic; }
+.fc-unverifiable-icon { font-size:16px; flex-shrink:0; }
+
+/* ── Mixed note ── */
+.fc-mixed-note { background:#fff8e8; border:1px solid #f0d88a; border-radius:6px; padding:10px 12px; font-size:12px; line-height:1.6; color:#5a4500; }
+
+/* ── Score row ── */
+.fc-score-row { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+.fc-total-score { font-family:'DM Mono',monospace; font-size:20px; font-weight:700; color:var(--text); }
+.fc-confidence { font-family:'DM Mono',monospace; font-size:10px; font-weight:700; letter-spacing:0.08em; }
+.fc-flags { display:flex; gap:6px; flex-wrap:wrap; }
+.fc-flag { font-size:10px; background:#fdecea; color:var(--red); border:1px solid #f5c2c0; border-radius:4px; padding:2px 7px; font-family:'DM Mono',monospace; }
+
+/* ── Criteria ── */
+.fc-criteria { display:flex; flex-direction:column; gap:8px; }
+.fc-criterion {
+  display: grid;
+  grid-template-columns: 150px auto 1fr;
+  gap: 6px 10px;
+  align-items: baseline;
+  font-size: 12px;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--border);
+}
+.fc-criterion:last-child { border-bottom: none; }
+.fc-criterion-label { color:var(--muted); font-weight:500; }
+.fc-criterion-stars { color:#f59e0b; white-space:nowrap; font-size:13px; }
+.fc-criterion-score { font-family:'DM Mono',monospace; font-size:10px; color:var(--muted); }
+.fc-criterion-reason { color:#44403c; line-height:1.4; }
+
+/* ── ToT branches ── */
+.fc-tot { display:flex; flex-direction:column; gap:6px; border-top:1px solid var(--border); padding-top:10px; }
+.fc-branch {
+  display: grid;
+  grid-template-columns: 110px 1fr;
+  gap: 8px;
+  font-size: 12px;
+  padding: 5px 0;
+  border-bottom: 1px solid var(--border);
+}
+.fc-branch:last-child { border-bottom: none; }
+.fc-branch-label { font-weight:600; color:var(--muted); font-size:11px; text-transform:uppercase; letter-spacing:0.05em; padding-top:2px; }
+.fc-branch-text { color:#44403c; line-height:1.5; }
+
+/* ── Summary ── */
+.fc-summary { background:var(--accent-light); border:1px solid rgba(37,99,235,0.15); border-radius:6px; padding:10px 12px; font-size:13px; color:#1e3a6e; line-height:1.6; }
+
+/* ── Complete / error ── */
+.fc-complete { text-align:center; font-size:13px; color:var(--green); font-weight:500; padding:12px; }
+.fc-error { background:var(--redBg,#fdecea); border:1px solid #f5c2c0; border-radius:8px; padding:12px 14px; font-size:13px; color:var(--red); }
+</style>

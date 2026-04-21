@@ -1,0 +1,67 @@
+{
+  "total_sources": 7,
+  "total_chunks": 27,
+  "languages": [
+    "si",
+    "en",
+    "ta"
+  ],
+  "sources": [
+    {
+      "type": "text",
+      "source": "doc1"
+    },
+    {
+      "type": "text",
+      "source": "doc2"
+    },
+    {
+      "type": "text",
+      "source": "manual"
+    },
+    {
+      "type": "pdf",
+      "source": "/tmp/9bd31c11-d0b9-46f9-8715-d4fbf1ddc99a_press_20260227_inflation_in_february_2026_ccpi_e.pdf"
+    },
+    {
+      "type": "text",
+      "source": "cb_report",
+      "tags": {
+        "date": "2025-01-15",
+        "key_areas": [
+          "Monetary Policy",
+          "Interest Rates"
+        ],
+        "keywords": [
+          "rate hike",
+          "Q1 2025",
+          "basis points"
+        ],
+        "doc_type": "report",
+        "author": "Central Bank"
+      }
+    },
+    {
+      "type": "text",
+      "source": "manual",
+      "tags": {
+        "date": "2026-03-11",
+        "key_areas": [],
+        "keywords": [],
+        "doc_type": "article",
+        "author": "CBSL"
+      }
+    },
+    {
+      "type": "text",
+      "source": "manual",
+      "tags": {
+        "date": "2026-03-11",
+        "key_areas": [],
+        "keywords": [],
+        "doc_type": "policy",
+        "author": "CBSL"
+      }
+    }
+  ]
+}

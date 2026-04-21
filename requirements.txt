@@ -1,0 +1,15 @@
+memvid
+FlagEmbedding==1.2.12
+transformers==4.44.0
+ctranslate2
+sentencepiece
+rank-bm25
+langdetect
+sentence-transformers
+faiss-cpu
+fastapi
+uvicorn
+pymupdf
+httpx
+beautifulsoup4
+google-genai
